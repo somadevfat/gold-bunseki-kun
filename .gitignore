@@ -1,0 +1,58 @@
+# --- IDE / System ---
+.vscode/
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# --- Bun / Node.js ---
+node_modules/
+bun.lockb
+dist/
+build/
+.next/
+out/
+.env
+.env*.local
+.npm
+.eslintcache
+
+# --- Go ---
+bin/
+main
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+go.work
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+*.db
+*.sqlite3
+
+# --- Docker ---
+.docker/
+
+# --- AWS / Terraform ---
+.terraform/
+*.tfstate*
+.aws/
+
+# --- Project Specific ---
+docs/development-logs/*.log
+tmp/
