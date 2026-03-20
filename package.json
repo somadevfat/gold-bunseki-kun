@@ -6,7 +6,11 @@
     "husky": "^9.1.7"
   },
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "lint:frontend": "cd apps/frontend && bun run lint",
+    "lint:api": "cd apps/api && golangci-lint run",
+    "lint:analytics": "cd apps/analytics && ruff check .",
+    "lint:all": "bun run lint:frontend && bun run lint:api && bun run lint:analytics"
   },
   "type": "module"
 }
