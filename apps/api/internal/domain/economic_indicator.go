@@ -24,6 +24,6 @@ type EconomicIndicator struct {
  * @return: 発表済みであればtrue、発表前（未来）であればfalse
  */
 func (e *EconomicIndicator) IsReleased(currentTime time.Time) bool {
-	/* 発表時刻が引数の現在時刻よりも前、もしくは同じであれば発表済みとする */
+	// 発表時刻が引数の現在時刻よりも前、もしくは同じであれば発表済みとする
 	return e.ReleaseTime.Before(currentTime) || e.ReleaseTime.Equal(currentTime)
 }

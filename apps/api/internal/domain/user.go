@@ -31,11 +31,11 @@ type User struct {
  * @return: サブスクリプションが有効であればtrue、失効していればfalse
  */
 func (u *User) IsPremiumActive(currentTime time.Time) bool {
-	/* 管理者の場合は無条件で全機能にアクセス可能とする（運用上の柔軟性） */
+	// 管理者の場合は無条件で全機能にアクセス可能とする（運用上の柔軟性）
 	if u.Role == RoleAdmin {
 		return true
 	}
 
-	/* サブスクリプションの有効期限が現在時刻より未来であれば、有効とみなす */
+	// サブスクリプションの有効期限が現在時刻より未来であれば、有効とみなす
 	return u.SubscriptionValidUntil.After(currentTime)
 }

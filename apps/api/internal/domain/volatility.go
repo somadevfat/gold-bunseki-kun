@@ -26,12 +26,12 @@ type Volatility struct {
  * @return: 計算エラー（高値が安値を下回る異常値の場合error）
  */
 func (v *Volatility) CalculateValue() error {
-	/* 高値が安値を下回っている場合は異常値としてエラーを返す */
+	// 高値が安値を下回っている場合は異常値としてエラーを返す
 	if v.HighPrice < v.LowPrice {
 		return errors.New("high price cannot be lower than low price")
 	}
 
-	/* 高値から安値を引いて真のボラティリティ（値幅）を算出 */
+	// 高値から安値を引いて真のボラティリティ（値幅）を算出
 	v.Value = v.HighPrice - v.LowPrice
 	return nil
 }

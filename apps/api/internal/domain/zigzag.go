@@ -28,6 +28,6 @@ type ZigZagPoint struct {
  * @return: スイングハイであればtrue、そうでなければfalse
  */
 func (z *ZigZagPoint) IsHigh() bool {
-	/* 自身のTypeが定数のHighと一致するかをチェックする */
+	// 自身のTypeが定数のHighと一致するかをチェックする
 	return z.Type == ZigZagTypeHigh
 }
