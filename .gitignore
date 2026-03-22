@@ -56,3 +56,4 @@ htmlcov/
 # --- Project Specific ---
 docs/development-logs/*.log
 tmp/
+apps/api/api
