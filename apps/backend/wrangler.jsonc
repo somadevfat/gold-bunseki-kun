@@ -1,0 +1,40 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "backend",
+  "vars": {
+    "ANALYTICS_SERVICE_URL": "http://127.0.0.1:8000"
+  },
+  "main": "src/index.ts",
+  "compatibility_date": "2026-03-27",
+  "compatibility_flags": ["nodejs_compat"],
+  // "vars": {
+  //   "MY_VAR": "my-variable"
+  // },
+  // "kv_namespaces": [
+  //   {
+  //     "binding": "MY_KV_NAMESPACE",
+  //     "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  //   }
+  // ],
+  // "r2_buckets": [
+  //   {
+  //     "binding": "MY_BUCKET",
+  //     "bucket_name": "my-bucket"
+  //   }
+  // ],
+  "d1_databases": [
+    {
+      "binding": "gold_vola_db",
+      "database_name": "gold-vola-db",
+      "database_id": "6e4ec3ab-640c-4f16-a2bd-fe549145b88c",
+      "migrations_dir": "migrations"
+    }
+  ],
+  // "ai": {
+  //   "binding": "AI"
+  // },
+  // "observability": {
+  //   "enabled": true,
+  //   "head_sampling_rate": 1
+  // }
+}

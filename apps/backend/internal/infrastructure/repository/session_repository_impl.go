@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"time"
 	"gold-vola-bunseki/backend/internal/application/port"
 	"gold-vola-bunseki/backend/internal/domain"
 
@@ -93,10 +94,21 @@ func (r *SessionRepositoryImpl) GetThresholds(ctx context.Context) (map[string]*
 }
 
 /*
- * FindPreviousEvent は指定した指標（EventName）が「前回」含まれていたセッションを検索します。
- * 現在（今日）のイベントを除外するため、最新の2件を取得し、2番目を返します。
+ * resolveEventSearchName は「雇用統計」などの通称を、DB内の正式名称（非農業部門雇用者数など）に変換します。
  */
+func resolveEventSearchName(name string) string {
+	switch name {
+	case "雇用統計":
+		return "非農業部門雇用者数" // DB内の実名に合わせる
+	case "コアCPI":
+		return "コアCPI"
+	default:
+		return name
+	}
+}
+
 func (r *SessionRepositoryImpl) FindPreviousEvent(ctx context.Context, eventName string) (*domain.SessionVolatility, error) {
+	searchName := resolveEventSearchName(eventName)
 	query := `
 		SELECT id, date, session_name, 
 		       TO_CHAR(start_time_jst, 'HH24:MI'), 
@@ -107,7 +119,7 @@ func (r *SessionRepositoryImpl) FindPreviousEvent(ctx context.Context, eventName
 		ORDER BY date DESC, start_time_jst DESC
 		LIMIT 2
 	`
-	rows, err := r.db.QueryContext(ctx, query, "%"+eventName+"%")
+	rows, err := r.db.QueryContext(ctx, query, "%"+searchName+"%")
 	if err != nil {
 		return nil, err
 	}
@@ -130,16 +142,24 @@ func (r *SessionRepositoryImpl) FindPreviousEvent(ctx context.Context, eventName
 		sessions = append(sessions, &s)
 	}
 
-	if len(sessions) < 2 {
-		if len(sessions) == 1 {
-			// 1件しかない場合はそれが「前回」かもしれない（今日がまだ起きていない場合）
-			return sessions[0], nil
-		}
-		return nil, nil // 見つからない
+	if len(sessions) == 0 {
+		return nil, nil // データなし
 	}
 
-	// 最新から2番目が「前回」
-	return sessions[1], nil
+	// 判定：今日の日付 (JST)
+	now := time.Now().UTC().Add(9 * time.Hour).Format("2006-01-02")
+	latest := sessions[0]
+
+	// もし最新が「今日」なら、それは現在のイベントなので「前回」としては sessions[1] を返す
+	if latest.Date.Format("2006-01-02") == now {
+		if len(sessions) > 1 {
+			return sessions[1], nil
+		}
+		return nil, nil // 今日分しかない
+	}
+
+	// 最新が過去なら、それをそのまま前回分（最新の記録）として返す
+	return latest, nil
 }
 
 /*
@@ -180,7 +200,8 @@ func (r *SessionRepositoryImpl) GetEventStats(ctx context.Context, eventName str
 		FROM session_volatilities
 		WHERE events_linked LIKE $1
 	`
-	rows, err := r.db.QueryContext(ctx, query, "%"+eventName+"%")
+	searchName := resolveEventSearchName(eventName)
+	rows, err := r.db.QueryContext(ctx, query, "%"+searchName+"%")
 	if err != nil {
 		return nil, err
 	}

@@ -8,7 +8,8 @@ const INDICATORS = [
 ];
 
 /*
- * IndicatorSelector は URL のクエリパラメータ (?event=...) を操作するクライアントコンポーネント。
+ * IndicatorSelector は URL のクエリパラメータ (?event=...) を操作する。
+ * Notionのタブやセレクト風のミニマルなデザイン。
  */
 export default function IndicatorSelector() {
   const router = useRouter();
@@ -22,15 +23,15 @@ export default function IndicatorSelector() {
   };
 
   return (
-    <div className="flex flex-wrap gap-2 mb-6">
+    <div className="flex flex-wrap gap-1.5 p-1 bg-slate-50/50 rounded-lg border border-slate-100 max-w-fit">
       {INDICATORS.map((ev) => (
         <button
           key={ev}
           onClick={() => handleSelect(ev)}
-          className={`px-3 py-1.5 text-xs font-medium rounded-md transition-all border
+          className={`px-2.5 py-1 text-[11px] font-semibold rounded-md transition-all
             ${currentEvent === ev 
-              ? "bg-blue-600 border-blue-500 text-white shadow-lg shadow-blue-900/40" 
-              : "bg-slate-800 border-slate-700 text-slate-400 hover:text-slate-200 hover:bg-slate-700 font-normal"}`}
+              ? "bg-white text-slate-900 border border-slate-200/50 shadow-sm" 
+              : "text-slate-400 hover:text-slate-600 hover:bg-slate-100/50 border border-transparent"}`}
         >
           {ev}
         </button>
