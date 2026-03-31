@@ -11,32 +11,29 @@ gold-vola-bunseki/
 │
 ├── apps/
 │   │
-│   ├── api/                     # ★ メイン バックエンドAPI (Go言語)
-│   │   ├── go.mod / go.sum
-│   │   ├── cmd/
-│   │   │   └── server/
-│   │   │       └── main.go      # アプリケーションのエントリーポイント
-│   │   │
-│   │   └── internal/            # 外部からインポート不可なパッケージ群
-│   │       │
-│   │       ├── domain/          # ── ドメイン層
-│   │       │   ├── entities/    # コアエンティティ（例: price.go, user.go）
-│   │       │   └── types/       # ドメイン全体で使う共通の型
-│   │       │
-│   │       ├── application/     # ── アプリケーション層
-│   │       │   ├── port/        # ★ ポート (リポジトリ等のインターフェース定義)
-│   │       │   ├── use_case/    # ユースケースの具体的なビジネスロジック実装
-│   │       │   └── service/     # ドメインサービスのビジネスロジック
-│   │       │
-│   │       ├── interface/       # ── インターフェース層
-│   │       │   ├── controller/  # HTTPコントローラー（外部からのリクエスト窓口）
-│   │       │   ├── router/      # ルーティング設定
-│   │       │   └── validator/   # リクエストの入力チェック（バリデーション）
-│   │       │
-│   │       └── infrastructure/  # ── インフラストラクチャ層
-│   │           ├── database/    # 共通処理、DBや外部API（Twelve Data等）の接続
-│   │           ├── repository/  # portで定義したインターフェースの具体的な実装
-│   │           └── server/      # Webサーバー（EchoやGin等）の設定・起動処理
+│   ├── backend/                 # ★ メイン バックエンドAPI (TypeScript / Hono)
+│   │   ├── package.json
+│   │   ├── wrangler.jsonc       # Cloudflare Workers 設定
+│   │   ├── src/
+│   │   │   ├── index.ts         # アプリケーションのエントリーポイント
+│   │   │   │
+│   │   │   ├── domain/          # ── ドメイン層 (Zod スキーマ, ビジネスロジック)
+│   │   │   │   ├── entities/    # コアエンティティ（例: price.ts, zigzag.ts）
+│   │   │   │   └── types/       # Zod OpenAPI 定義、共通の型
+│   │   │   │
+│   │   │   ├── application/     # ── アプリケーション層
+│   │   │   │   ├── port/        # ★ ポート (リポジトリ等のインターフェース定義)
+│   │   │   │   └── use_case/    # ユースケースの具体的なビジネスロジック実装
+│   │   │   │
+│   │   │   ├── interface/       # ── インターフェース層
+│   │   │   │   ├── controller/  # Hono ハンドラ（外部からのリクエスト窓口）
+│   │   │   │   ├── routes/      # Hono Zod OpenAPI ルーティング定義
+│   │   │   │   └── validator/   # Zod による入力バリデーション
+│   │   │   │
+│   │   │   └── infrastructure/  # ── インフラストラクチャ層
+│   │   │       ├── database/    # Cloudflare D1 / KV / Postgres 接続
+│   │   │       ├── repository/  # portで定義したインターフェースの具体的な実装
+│   │   │       └── external/    # 外部API（Twelve Data, Python Analytics）の接続
 │   │
 │   └── analytics/               # ★ データ分析・サブモジュール (Python)
 │       ├── pyproject.toml       # Pythonの依存関係
