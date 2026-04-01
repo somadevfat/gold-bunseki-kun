@@ -16,8 +16,8 @@ backend:
 	cd apps/backend && bun run dev
 
 frontend:
-	@echo "🌐 Starting Next.js Frontend (Port 3000)..."
-	cd apps/frontend && bun run dev
+	@echo "🌐 Starting vinext Frontend (Port 3001)..."
+	cd apps/frontend && bun run dev:vinext
 
 # ==============================================================================
 # データベース管理コマンド (Database Management)
