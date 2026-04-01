@@ -8,7 +8,11 @@
     "start": "next start",
     "lint": "eslint",
     "dev:vinext": "vite dev --port 3001",
-    "build:vinext": "vite build"
+    "build:vinext": "vite build",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:report": "playwright show-report"
   },
   "dependencies": {
     "chart.js": "^4.5.1",
@@ -22,6 +26,7 @@
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.30.3",
     "@cloudflare/workers-types": "^4.20260401.1",
+    "@playwright/test": "^1.59.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/react": "^16.3.2",
