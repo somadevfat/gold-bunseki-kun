@@ -10,19 +10,12 @@ export class GetLatestPriceUseCase {
 
   /**
    * execute は最新価格を返します。
-   * @return: PriceRecord
+   * @return: PriceRecord | null
    */
-  async execute(): Promise<PriceRecord> {
+  async execute(): Promise<PriceRecord | null> {
     const price = await this.priceRepo.getLatestPrice();
     if (!price) {
-      // 本来はカスタムエラー（NotFound）が理想的だが、現状はダミーを返すか例外を投げる
-      return {
-        timestamp: new Date().toISOString(),
-        open: 0,
-        high: 0,
-        low: 0,
-        close: 0,
-      };
+      return null;
     }
     return price;
   }

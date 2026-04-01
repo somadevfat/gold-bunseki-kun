@@ -31,7 +31,7 @@ export const latestPriceRoute = createRoute({
   path: "/api/v1/prices/latest",
   responses: {
     200: {
-      content: { "application/json": { schema: PriceRecordSchema } },
+      content: { "application/json": { schema: PriceRecordSchema.nullable() } },
       description: "最新の価格情報を取得します",
     },
   },

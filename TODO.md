@@ -27,13 +27,21 @@
 - [ ] `marketSessionsRoute` 内の自動同期ロジックを、新しい UseCase または既存の UseCase の内部へ移動する。
 - [ ] インターフェース層 (Hono) は、単にリクエストを受け取って UseCase を呼び出すだけに徹する。
 
-## 5. 型定義とスキーマの一元化
-- [ ] `SyncPayload` インターフェースを `d1BatchRepository.ts` からドメイン層または Zod スキーマ共有の場所へ移動し、重複を避ける。
-- [ ] Zod OpenAPI のスキーマから `infer` した型をリポジトリの引数などでも徹底して使用する。
+## 5. フロントエンド単体テスト (London School / Coverage 100%)
+ロジック層の完全な保護を目指します。
 
-## 6. テスタビリティの向上
-- [ ] リポジトリのインターフェース (Port) をより洗練させ、D1 依存のない単体テストを書きやすくする。
-- [ ] 現在 `any` は排除済みだが、さらに型ガードを強化して `unknown` からの変換を安全にする。
+- [ ] **Common Hooks テスト**
+  - [ ] `useIndicatorSelection.ts`: `useRouter`, `useSearchParams` とのインタラクションを検証。
+- [ ] **Market Replay Hooks テスト**
+  - [ ] `useReplayChart.ts`: `lightweight-charts` の API 呼び出し（初期化、データセット、マーカー描画）が正しく行われるかをモックで検証。
+- [ ] **Feature API テスト**
+  - [ ] `getReplayData.ts`: `apiClient` の呼び出しとレスポンス変換の検証。
+  - [ ] `getSessions.ts`: 同上。
+
+## 6. Playwright による機能結合テスト
+ユーザー視点での結合度を担保します。
+- [ ] 指標切り替え時のチャート再描画シナリオの実装。
+- [ ] エラー時の空表示（📭）の確認。
 
 ---
 ※このTODOリストは現状の分析結果です。優先順位を相談した上で作業に入ります。
