@@ -10,7 +10,10 @@
     "lint:frontend": "cd apps/frontend && bun run lint",
     "lint:backend": "cd apps/backend && bun run lint",
     "lint:analytics": "cd apps/analytics && ruff check .",
-    "lint:all": "bun run lint:frontend && bun run lint:backend"
+    "lint:all": "bun run lint:frontend && bun run lint:backend",
+    "test:frontend": "cd apps/frontend && bun run test",
+    "test:backend": "cd apps/backend && bun run test",
+    "test:all": "bun run test:frontend && bun run test:backend"
   },
   "workspaces": [
     "apps/*"
