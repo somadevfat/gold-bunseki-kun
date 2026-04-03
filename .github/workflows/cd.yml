@@ -46,7 +46,9 @@ jobs:
       - uses: oven-sh/setup-bun@v2
       - name: Install dependencies
         run: cd apps/frontend && bun install
-      - name: Build and Deploy to Cloudflare Pages
+      - name: Build Frontend
+        run: cd apps/frontend && bun run build:vinext
+      - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
