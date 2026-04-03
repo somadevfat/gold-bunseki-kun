@@ -10,7 +10,7 @@
   "assets": {
     "directory": "dist/client",
     "not_found_handling": "none",
-    "binding": "ASSETS"
+    "binding": "CF_ASSETS"
   },
   "images": {
     "binding": "IMAGES"
