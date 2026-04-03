@@ -23,3 +23,9 @@ jobs:
 
       - name: Run Tests
         run: bun run test:all
+
+      - name: Install Playwright Browsers
+        run: cd apps/frontend && npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        run: cd apps/frontend && bun run test:e2e
