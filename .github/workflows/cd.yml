@@ -53,9 +53,9 @@ jobs:
         run: cd apps/frontend && bun install
       - name: Build Frontend
         run: cd apps/frontend && bun run build:vinext
-      - name: Deploy to Cloudflare Pages
+      - name: Deploy to Cloudflare
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           workingDirectory: 'apps/frontend'
-          command: pages deploy dist --project-name=gold-vola-frontend
+          command: deploy --minify
