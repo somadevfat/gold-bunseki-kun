@@ -5,6 +5,19 @@
 
 ## 🏗️ 最近の作業ログ (Recent Work Logs)
 
+### 2026-04-03 (ORM導入・引き継ぎ) - VPS化に向けた PostgreSQL および Drizzle ORM のセットアップ開始
+
+- **達成したタスク**:
+  - **Docker 環境の準備**: プロジェクトルートに `docker-compose.yml` を作成し、PostgreSQL (16-alpine) のローカル開発・VPS用設定を追加。
+  - **ORMの導入**: `apps/backend` に `drizzle-orm`, `postgres` クライアント、`drizzle-kit` をインストール。
+  - **スキーマ定義**: D1 の `0001_initial_schema.sql` を元に、Drizzle 用の TypeScript スキーマを `apps/backend/src/infrastructure/database/schema.ts` に実装。
+  - **設定ファイルの作成**: Drizzle Kit 用の設定ファイル `apps/backend/drizzle.config.ts` を作成。
+- **次回への申し送り事項 (引き継ぎ内容)**:
+  - **1. DB起動とマイグレーション**: `docker-compose up -d db` を実行し、`bunx drizzle-kit generate` および `bunx drizzle-kit migrate` (または `push`) を行って DB スキーマを適用すること。
+  - **2. リポジトリの書き換え**: `d1PriceRepository.ts` 等の各リポジトリ実装を、Drizzle を使った PostgreSQL 用の実装 (`pgPriceRepository.ts` 等) に書き換えること。
+  - **3. Hono の起動方法変更**: `src/index.ts` を Cloudflare Workers 形式 (`export default app`) から、VPS用 (`Bun.serve`) 形式に変更すること。
+  - **4. テストの修正**: リポジトリのモックを D1Database から Drizzle/Postgres 用に修正し、カバレッジ100%を再確保すること。
+
 ### 2026-04-03 (VPSデプロイ向けアーキテクチャ移行) - バックエンドのVPS化およびフロントエンドのCloudflare継続に関する設計判断とドキュメント一新
 
 - **達成したタスク**:

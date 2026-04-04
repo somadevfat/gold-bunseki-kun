@@ -1,44 +1,19 @@
 version: '3.8'
 
 services:
-  # ============================================================================
-  # 🗄️ PostgreSQL Database (データの保存先)
-  # ============================================================================
   db:
     image: postgres:16-alpine
     container_name: gold-vola-db
-    restart: always
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
       POSTGRES_DB: gold_vola_db
+      TZ: Asia/Tokyo
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user -d gold_vola_db"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    restart: unless-stopped
 
-  # ============================================================================
-  # 🛠️ pgAdmin (データベースを直接見るためのGUIツール)
-  # ============================================================================
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: gold-vola-pgadmin
-    restart: always
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@example.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    ports:
-      - "5050:80"
-    depends_on:
-      - db
-
-# ==============================================================================
-# 💾 Volumes (コンテナを落としてもデータが消えないようにするための設定)
-# ==============================================================================
 volumes:
   postgres_data:
