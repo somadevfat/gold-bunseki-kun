@@ -5,6 +5,17 @@
 
 ## 🏗️ 最近の作業ログ (Recent Work Logs)
 
+### 2026-04-03 (VPSデプロイ向けアーキテクチャ移行) - バックエンドのVPS化およびフロントエンドのCloudflare継続に関する設計判断とドキュメント一新
+
+- **達成したタスク**:
+  - **アーキテクチャの再設計**: バックエンド環境を Cloudflare Workers (D1) から VPS上の Node.js(Bun) サーバー (PostgreSQL) へ移行する決定をドキュメント化した。フロントエンドは引き続き Cloudflare Pages で CDN 配信する。
+  - **プロジェクト憲法とドキュメントの更新**: `GEMINI.md`, `architecture.md`, `README.md`, `DEPLOYMENT.md` の記述をすべて新しいアーキテクチャに合わせて書き換えた。
+  - **ADRの作成**: `docs/adr/0003-vps-backend-cloudflare-frontend.md` を作成し、コスト最適化とDB要件に基づく設計判断の背景を記録した。
+  - **CI/CD の退避**: これまでの完璧な Cloudflare 用 CI/CD パイプラインを `archive/cloudflare-deploy` ブランチに保存し、`main` ブランチの CD を無効化した上で VPS デプロイ向けクリーンな状態を作成した。
+- **次回への申し送り事項**:
+  - バックエンドコードの実装変更：Cloudflare Workers 用の `wrangler.jsonc` とバインディング処理を取り除き、Bun で直接起動する `Bun.serve` の形式へ移行し、ORM (PrismaやDrizzle等) または生の PostgreSQL ドライバーを導入する作業が必要。
+  - VPS 上の Docker で PostgreSQL を起動する `docker-compose.yml` の準備。
+
 ### 2026-04-03 - テストカバレッジ 100.00% 達成、および CI/CD パイプラインの完全自動化
 
 - **達成したタスク**:
