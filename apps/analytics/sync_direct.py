@@ -64,7 +64,7 @@ def sync_from_mt5(years: int, mode: str):
             print(f"   パス: {calendar_cache_file}")
             return
             
-        with open(calendar_cache_file, 'r', encoding='utf-8') as f:
+        with open(calendar_cache_file, 'r', encoding='cp932') as f:
             calendar_data = json.load(f)
             
         if not calendar_data or len(calendar_data) == 0:
