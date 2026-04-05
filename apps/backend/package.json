@@ -3,12 +3,15 @@
   "type": "module",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "wrangler dev",
-    "deploy": "wrangler deploy --minify",
-    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "dev": "bun --hot src/index.ts",
+    "build": "bun build ./src/index.ts --outdir ./dist --target bun",
+    "start": "bun src/index.ts",
     "test": "bun test",
     "lint": "eslint .",
-    "dev:mock": "bun run src/mock-server.ts"
+    "dev:mock": "bun run src/mock-server.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push"
   },
   "dependencies": {
     "@hono/swagger-ui": "^0.6.1",
