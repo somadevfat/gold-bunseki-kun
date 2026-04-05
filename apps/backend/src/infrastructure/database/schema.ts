@@ -54,3 +54,13 @@ export const economicEvents = pgTable('economic_events', {
 }, (table) => [
   uniqueIndex('idx_events_name_datetime').on(table.datetimeJst, table.eventName),
 ]);
+
+export const syncStatus = pgTable('sync_status', {
+  id: integer('id').primaryKey().notNull(), // Should be 1 (single record)
+  lastCandleAt: text('last_candle_at'),
+  lastSessionAt: text('last_session_at'),
+  lastEventAt: text('last_event_at'),
+  totalCandles: integer('total_candles').default(0).notNull(),
+  syncHealth: text('sync_health').default('Healthy').notNull(),
+});
+
