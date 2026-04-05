@@ -77,19 +77,41 @@ class MarketAnalyzer:
         df.set_index('Datetime_JST', inplace=True)
         return df[['OPEN', 'HIGH', 'LOW', 'CLOSE']]
 
-    def load_calendar_data(self, csv_path: str) -> pd.DataFrame:
+    def load_calendar_data(self, file_path: str) -> pd.DataFrame:
         """
-        MQL5から出力した経済指標カレンダーデータを読み込む。
+        MQL5から出力した経済指標カレンダーデータを読み込む (CSVまたはJSON)。
         """
-        print(f"[Core] 経済指標データのロード開始: {csv_path}")
-        if not Path(csv_path).exists():
-            # もしCSVがなければJSONキャッシュを探す
+        print(f"[Core] 経済指標データのロード開始: {file_path}")
+        path = Path(file_path)
+        if not path.exists():
+            print(f"[Warning] Calendar file not found: {file_path}")
             return pd.DataFrame()
 
-        df = pd.read_csv(csv_path, encoding='cp932')
-        df.replace(-9223372036854775808, np.nan, inplace=True)
-        df['Time'] = pd.to_datetime(df['Time'], format='%Y.%m.%d %H:%M')
-        df['Datetime_JST'] = df['Time'] + pd.Timedelta(hours=self.offset)
+        # JSON形式の読み込み (MQL5 GoldCalendarPush.mq5 の出力に対応)
+        if path.suffix.lower() == '.json':
+            import json
+            with open(path, 'r', encoding='utf-8') as f:
+                data = json.load(f)
+            df = pd.DataFrame(data)
+            if df.empty: return df
+            
+            # MQL5の JSON 形式 (time: "2024-03-27T21:30:00") を Datetime_JST に変換
+            df['Datetime_JST'] = pd.to_datetime(df['time'])
+            # カラム名を内部形式に統一
+            df = df.rename(columns={
+                'name': 'EventName',
+                'importance': 'Importance',
+                'actual': 'Actual',
+                'forecast': 'Forecast',
+                'prev': 'Prev'
+            })
+        else:
+            # 既存の CSV 読み込み
+            df = pd.read_csv(file_path, encoding='cp932')
+            df.replace(-9223372036854775808, np.nan, inplace=True)
+            df['Time'] = pd.to_datetime(df['Time'], format='%Y.%m.%d %H:%M')
+            df['Datetime_JST'] = df['Time'] + pd.Timedelta(hours=self.offset)
+            
         return df
 
     # ===========================================================================
