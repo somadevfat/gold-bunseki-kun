@@ -29,7 +29,7 @@ export default defineConfig({
   /* テスト実行前に「モックバックエンド」と「フロントエンド」を自動起動する */
   webServer: [
     {
-      command: 'cd ../backend && bun run dev:mock',
+      command: 'bun run dev:mock',
       port: 8788,
       reuseExistingServer: !process.env.CI,
     },

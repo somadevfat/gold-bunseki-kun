@@ -1,17 +1,24 @@
 import { hc } from 'hono/client';
 import type { AppType } from 'backend/src/index';
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8787';
+const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+
+export type AppClient = {
+  api: {
+    v1: {
+      market: {
+        indicators: { $get: (args?: Record<string, never>, options?: { init?: RequestInit }) => Promise<{ ok: boolean; json: () => Promise<IndicatorsResponse> }> };
+        replay: { $get: (args: { query: { event: string } }, options?: { init?: RequestInit }) => Promise<{ ok: boolean; json: () => Promise<ReplayDataResponse> }> };
+        sessions: { $get: (args: { query: { limit: string } }, options?: { init?: RequestInit }) => Promise<{ ok: boolean; json: () => Promise<SessionsResponse> }> };
+      }
+    }
+  }
+};
 
 /**
  * apiClient はバックエンド API を呼び出すための RPC クライアントです。
- * 
- * NOTE: 
- * TypeScript がパッケージ境界を越えた複雑なジェネリクスを正しく推論できず 'unknown' になる場合があるため、
- * ここでは意図的に any を使用しつつ、利用箇所でレスポンス型（ReplayDataResponse等）を適用して安全性を確保します。
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const apiClient = hc<AppType>(baseUrl) as any;
+export const apiClient = hc<AppType>(baseUrl) as unknown as AppClient;
 
 /* --- レスポンス型の定義 (バックエンドの型から推論) --- */
 
