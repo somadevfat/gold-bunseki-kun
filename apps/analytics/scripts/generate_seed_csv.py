@@ -1,29 +1,33 @@
+import sys
+import argparse
+from pathlib import Path
 import MetaTrader5 as mt5
 import pandas as pd
-from market_analyzer import MarketAnalyzer
-import sys
+
+# 親ディレクトリ(apps/analytics)のcoreモジュールを参照できるようにする
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+from core.market_analyzer import MarketAnalyzer
 
 # ==========================================
 # 設定
 # ==========================================
-SYMBOL = "GOLD"        # 対象銘柄
-FETCH_COUNT = 500000   # 出力する価格データの本数 (50万本 ≒ 約1年半の1分足)
+SYMBOL = "GOLD"
 
-def export_to_csv():
+def export_to_csv(fetch_count: int):
     print("====================================================")
-    print("🚀 [Export Mode] MT5からデータを自動取得し、CSVとして出力します")
-    print(f"対象銘柄: {SYMBOL} / 取得予定件数: {FETCH_COUNT}本")
+    print("🚀 [Seed Data Generation] MT5からデータを自動取得し、CSVとして出力します")
+    print(f"対象銘柄: {SYMBOL} / 取得予定件数: {fetch_count}本")
     print("====================================================")
 
-    # 1. MT5に接続 (ここから価格データを自動で取得します)
+    # 1. MT5に接続
     if not mt5.initialize():
         print("[Error] MT5への接続に失敗しました。MT5が起動しているか確認してください。")
         sys.exit(1)
 
     try:
         # --- (A) 1分足データの自動取得 ---
-        print(f"[Info] MT5から {SYMBOL} の1分足を {FETCH_COUNT} 本取得中... (数秒かかります)")
-        rates = mt5.copy_rates_from_pos(SYMBOL, mt5.TIMEFRAME_M1, 0, FETCH_COUNT)
+        print(f"[Info] MT5から {SYMBOL} の1分足を {fetch_count} 本取得中... (数秒かかります)")
+        rates = mt5.copy_rates_from_pos(SYMBOL, mt5.TIMEFRAME_M1, 0, fetch_count)
         if rates is None or len(rates) == 0:
             print(f"❌ {SYMBOL} のデータ取得に失敗しました。")
             return
@@ -45,8 +49,8 @@ def export_to_csv():
         print("[Info] セッション解析を開始します...")
         result_df = analyzer.analyze_sessions(price_df, calendar_df)
         
-        # ここでAPIに送らずに、ローカルフォルダにCSVとして書き出す
-        analyzer.export_to_d1_csv(result_df, calendar_df, price_df, output_dir="seed_data")
+        # PostgreSQL投入用のCSVを生成
+        analyzer.export_to_pg_csv(result_df, calendar_df, price_df, output_dir="seed_data")
         
         print("\n[Done] 🎉 CSVの出力が完了しました！ (seed_data/ フォルダを確認してください)")
 
@@ -56,4 +60,8 @@ def export_to_csv():
         mt5.shutdown()
 
 if __name__ == "__main__":
-    export_to_csv()
+    parser = argparse.ArgumentParser(description="Export MT5 Data and Analytics to CSV for PostgreSQL Seed")
+    parser.add_argument("--count", type=int, default=1500000, help="Number of M1 candles to fetch (default: 1500000 for approx 3 years)")
+    args = parser.parse_args()
+    
+    export_to_csv(args.count)

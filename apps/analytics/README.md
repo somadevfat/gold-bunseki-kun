@@ -1,35 +1,44 @@
-# Python Market Analysis Engine
+# Python Analytics Engine
 
-このディレクトリ (`apps/analytics/`) には、MetaTrader 5 (MT5) からデータを取得し、地合い判定の解析を行った後、バックエンド (PostgreSQL) へ同期するためのスクリプトが含まれています。
+このディレクトリ (`apps/analytics/`) には、MetaTrader 5 (MT5) からデータを取得し、経済指標カレンダーと組み合わせてボラティリティを解析する Python アプリケーションが含まれています。
 
-## 📂 ディレクトリ構成とスクリプトの役割
+## 📂 ディレクトリ構成
 
-- **`market_analyzer.py`**: コアとなる解析エンジン。価格データと経済指標を組み合わせてボラティリティを計算します。単体で実行するとデバッグ用のCSVを出力できます。
-- **`seed.py`**: **【シード用】** 過去の大量のデータ（例: 過去1年半分の50万件など）を一括で取得・解析し、バックエンドの **`/api/v1/sync/seed`** に送信します。初回のデータベース構築時に1度だけ実行します。
-- **`sync.py`**: **【常用同期用】** 直近の数百件のデータのみを高速に取得・解析し、バックエンドの **`/api/v1/sync/data`** に送信します。実稼働時は、タスクスケジューラなどで1分ごとに定期実行させます。
+- **`core/market_analyzer.py`**:
+  - 【共通ロジック】価格データと経済指標を組み合わせ、セッションごとのボラティリティや地合いを算出するコアエンジン。
+- **`scripts/generate_seed_csv.py`**:
+  - 【シードデータ生成用】MT5から過去数年分（デフォルト3年、約150万件）の1分足を取得し、PostgreSQL投入用のCSV群を `seed_data/` に出力するシンプルな手動スクリプト。
+- **`api/server.py`**:
+  - 【運用APIサーバー】FastAPIで動作し、外部からのリクエストに応じてMT5から直近の差分データを取得・解析し、バックエンド (Hono) へJSONでPush送信する。
 
-## 🚀 実行フロー (ローカルから VPS への同期)
+## 🚀 実行手順
 
-1. **前提条件**
-   - デスクトップで MT5 が起動しており、ログイン状態であること。
-   - MT5 側に `GoldCalendarPush.mq5`（EA）がセットされており、バックグラウンドで `gold_calendar_cache.json` が `%APPDATA%` 内に生成されていること。
-   - バックエンド (Hono API) が起動していること（`make dev` または VPS 上で稼働）。
+### 前提条件
+- デスクトップで MT5 が起動しており、ログイン状態であること。
+- MT5 側に `GoldCalendarPush.mq5` がセットされ、バックグラウンドで `%APPDATA%\MetaQuotes\Terminal\Common\Files\gold_calendar_cache.json` が生成されていること。
+- Pythonの仮想環境を有効化し、必要なパッケージをインストールしていること。
+  ```bash
+  cd apps/analytics
+  python -m venv venv
+  .\venv\Scripts\activate
+  pip install -r requirements.txt
+  ```
 
-2. **初回シード（データの一括投入）**
-   ```bash
-   cd apps/analytics
-   # 仮想環境を有効化 (Windows)
-   .\venv\Scripts\activate
-   
-   # シードスクリプトを実行 (時間がかかります)
-   python seed.py
-   ```
+### 1. 初回のデータ投入 (CSVシード)
+DB構築時など、過去の大量のデータを投入したい場合に使用します。
+```bash
+# 実行すると apps/analytics/seed_data/ に CSVファイルが生成されます
+python scripts/generate_seed_csv.py
+```
+生成されたCSVは、PostgreSQLの `COPY` コマンド等を使用して手動でDBに流し込んでください。
 
-3. **常用同期（1分ごとの差分更新）**
-   ```bash
-   cd apps/analytics
-   .\venv\Scripts\activate
-   
-   # 同期スクリプトを実行 (高速)
-   python sync.py
-   ```
+### 2. 運用時の差分同期 (FastAPIサーバー)
+日々の運用で、最新のデータをHonoバックエンドへPushする場合に使用します。
+```bash
+# FastAPIサーバーを起動（デフォルト: ポート8000）
+python api/server.py
+```
+サーバー起動後、定期的に以下のエンドポイントを叩くことで、差分データがHono(Port 3000)へPushされます。
+```bash
+curl -X POST http://localhost:8000/api/sync
+```

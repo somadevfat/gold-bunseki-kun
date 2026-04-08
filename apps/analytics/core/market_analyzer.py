@@ -80,7 +80,30 @@ class MarketAnalyzer:
     def load_calendar_data(self, file_path: str) -> pd.DataFrame:
         """
         MQL5から出力した経済指標カレンダーデータを読み込む (CSVまたはJSON)。
+        file_path が 'auto' の場合、MT5が出力する %APPDATA% 以下の共通ファイルを探す。
         """
+        if file_path == 'auto':
+            import os
+            # Windows の Roaming AppData フォルダパスを取得
+            appdata = os.getenv('APPDATA')
+            if appdata:
+                auto_path = Path(appdata) / "MetaQuotes" / "Terminal" / "Common" / "Files" / "gold_calendar_cache.json"
+                if auto_path.exists():
+                    file_path = str(auto_path)
+                    print(f"[Core] Auto-detected calendar file: {file_path}")
+                else:
+                    # 見つからなかった場合のフォールバック (テスト用など)
+                    fallback_path = Path("gold_calendar_cache.json")
+                    if fallback_path.exists():
+                        file_path = str(fallback_path)
+                        print(f"[Core] Using local fallback calendar file: {file_path}")
+                    else:
+                         print(f"[Warning] Auto-detected calendar file not found at {auto_path} or locally.")
+                         return pd.DataFrame()
+            else:
+                print(f"[Warning] APPDATA environment variable not found. Cannot auto-detect calendar file.")
+                return pd.DataFrame()
+
         print(f"[Core] 経済指標データのロード開始: {file_path}")
         path = Path(file_path)
         if not path.exists():
@@ -262,14 +285,14 @@ class MarketAnalyzer:
             "zigzagPoints": []
         }
 
-    def export_to_d1_csv(self, session_df: pd.DataFrame, calendar_df: pd.DataFrame, price_df: pd.DataFrame, output_dir: str = "seed_data"):
+    def export_to_pg_csv(self, session_df: pd.DataFrame, calendar_df: pd.DataFrame, price_df: pd.DataFrame, output_dir: str = "seed_data"):
         """
-        D1 インポート用の CSV ファイル群を生成する。
-        @responsibility: wrangler d1 import コマンドで本番DBに一括投入可能な形式でデータを出力する。
+        PostgreSQL インポート用の CSV ファイル群を生成する。
+        @responsibility: COPYコマンドやDBクライアントで本番DBに一括投入可能な形式でデータを出力する。
         """
         out = Path(output_dir)
         out.mkdir(exist_ok=True)
-        print(f"[Core] D1シード用CSVを出力中 -> {out.absolute()}")
+        print(f"[Core] PostgreSQLシード用CSVを出力中 -> {out.absolute()}")
 
         # 1. prices.csv (生価格)
         p_df = price_df.reset_index().rename(columns={"Datetime_JST": "timestamp", "OPEN": "open", "HIGH": "high", "LOW": "low", "CLOSE": "close"})
